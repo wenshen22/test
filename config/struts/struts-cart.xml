@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN" 
+	"http://struts.apache.org/dtds/struts-2.1.7.dtd" >
+<struts>
+	<package name="cart" extends="ssh-default" namespace="/cart">
+		
+		<action name="cartAction" class="cartAction">
+			<result name="cart_list">
+				/WEB-INF/jsp/cart_list.jsp
+			</result>
+			
+			<result name="buy_success" type="json">
+			</result>
+			
+			<result name="delete_success">
+				/WEB-INF/jsp/cart_list.jsp
+			</result>
+			
+			<result name="recover_success">
+				/WEB-INF/jsp/cart_list.jsp
+			</result>
+			
+			<result name="update_success" type="json">
+			</result>
+		</action>
+		
+	</package>
+</struts>

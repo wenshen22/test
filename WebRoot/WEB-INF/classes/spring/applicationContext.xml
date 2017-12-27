@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	
+	<!-- spring管理hibernate -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:hibernate/cfg/hibernate.cfg.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- spring管理配置 spring AOP（实现） -->
+	<!-- 创建一个事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 通知 -->
+	<tx:advice id="tranAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED"/>
+			<tx:method name="update*" propagation="REQUIRED"/>
+			<tx:method name="delete*" propagation="REQUIRED"/>
+			<tx:method name="find*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 事务通知织入到切面 -->
+	<aop:config>
+		<!-- 定义切面 -->
+		<aop:pointcut expression="execution(* com.tarena.dao.*.*(..))" id="tranPointCut"/>
+		<!-- 织入 -->
+		<aop:advisor advice-ref="tranAdvice" pointcut-ref="tranPointCut"/>
+	</aop:config>
+	
+	<!-- struts中的action让spring容器管理 -->
+	<bean id="mainAction" class="com.tarena.web.struts.MainAction">
+		<!-- IComputerService icomputerService = new ComputerServiceImpl() -->
+		<property name="icomputerService" ref="computerServiceImpl"></property>
+	</bean>
+	
+	<bean id="cartAction" class="com.tarena.web.struts.CartAction">
+	</bean>
+	
+	<!-- biz -->
+	<bean id="computerServiceImpl" class="com.tarena.biz.impl.ComputerServiceImpl">
+		<!-- IComputerDao icomputerDao = new ComputerDaoImpl() -->
+		<property name="icomputerDao" ref="computerDaoImpl"></property>
+	</bean>
+	
+	<!-- new ComputerDaoImpl -->
+	<bean id="computerDaoImpl" class="com.tarena.dao.impl.ComputerDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+</beans>
+
